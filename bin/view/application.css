@@ -1,0 +1,15 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.text-field {
+    -fx-background-color: -fx-text-box-border, -fx-background ;
+    -fx-background-insets: 1, 0 0 0 0 ;
+    -fx-background-radius: 0 ;
+    -fx-alignment: center-left;
+}
+#name{
+	-fx-background-color: "white";
+	-fx-border-color: grey;
+    -fx-border-width: 0.5;
+}
+.table-column{
+	-fx-alignment: center-left;
+}
