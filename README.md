@@ -1,9 +1,11 @@
 "# InventoryManager
-   This inventory manager app developed mostly on Java make use of Java for backend while 
-   using JavaFX and SceneBuilder for UI. The logIn system goes through a locally hosted ]
-   MySQL server. Here are some of the important MYSQL procedures if you intend to replicate 
-   something similar
-   'addUser' procedure (This is called in the Java code to try registering an account"
+   This inventory manager app developed mostly on Java make use of Java for backend while<br /> 
+   using JavaFX and SceneBuilder for UI. The logIn system goes through a locally hosted ]<br />
+   MySQL server. Here are some of the important MYSQL procedures if you intend to replicate<br /> 
+   something similar<br />
+   
+   'addUser' procedure (This is called in the Java code to try registering an account"<br />
+```
     CREATE DEFINER=`root`@`localhost` PROCEDURE `addUser`(
 		username varchar(30),
     	pass varchar (30),
@@ -14,7 +16,9 @@
 		INSERT INTO users 
     	VALUES (username, SHA2(CONCAT(pass,salty),256), salty, userdata);
 	END
-   'logIn' procedure
+```
+   'logIn' procedure (Called in the logInController to try logging in) <br />
+```
 	CREATE DEFINER=`root`@`localhost` PROCEDURE `logInTime`(
 		username varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_cs,
     	password1 varchar (30)
@@ -32,4 +36,5 @@
 			SELECT null;
     	END IF;
 	END
+```	
 " 
