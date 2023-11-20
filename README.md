@@ -1,6 +1,6 @@
-"# InventoryManager
-   This inventory manager app developed make use of Java for backend while<br /> 
-   using JavaFX and SceneBuilder for UI. The logIn system goes through a locally hosted <br />
+"# InventoryManager<br />
+   This inventory manager app makes use of Java for backend while using JavaFX <br /> 
+   and SceneBuilder for UI. The logIn system goes through a locally hosted <br />
    MySQL server. Here are some of the important MYSQL procedures if you intend to replicate<br /> 
    something similar<br />
    
