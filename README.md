@@ -4,7 +4,7 @@
    MySQL server. Here are some of the important MYSQL procedures if you intend to replicate<br /> 
    something similar<br />
    
-   'addUser' procedure (This is called in the Java code to try registering an account"<br />
+   'addUser' procedure (This is called in the Java code to try registering an account)<br />
 ```
     CREATE DEFINER=`root`@`localhost` PROCEDURE `addUser`(
 		username varchar(30),
