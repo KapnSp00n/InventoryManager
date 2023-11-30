@@ -3,21 +3,17 @@ package application;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,7 +24,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import java.io.ByteArrayOutputStream;
 
 public class LogInController {
 	@FXML
@@ -144,7 +139,7 @@ public class LogInController {
 						PreparedStatement stmt = con.prepareStatement("CALL addUser(?, ?, ?);");
 						stmt.setString(1, name);
 						stmt.setString(2, newPass);
-						Client mrBruh = new Client(name, newPass);
+						Client mrBruh = new Client(name);
 						stmt.setObject(3, mrBruh);
 						stmt.executeUpdate();
 						((Node) event.getSource()).getScene().setRoot(logRoot);

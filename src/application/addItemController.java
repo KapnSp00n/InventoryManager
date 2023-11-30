@@ -21,7 +21,7 @@ public class addItemController {
 	Item currItem;
 	int currItemPos;
 
-	public void prep() {
+	public void prepListener() {
 		if (currItem !=null) {
 			name.setText(currItem.getName());
 			price.setText(currItem.getPrice() + "");
@@ -34,7 +34,7 @@ public class addItemController {
 			}
 		});
 	}
-	public void callMePwease() {
+	public void prepFilter() {
 		UnaryOperator<TextFormatter.Change> doubleFilter = change -> {
             String newText = change.getControlNewText();
             if (newText.matches("(([1-9][0-9]*)|0)?(\\.[0-9]*)?")) { 
@@ -42,7 +42,7 @@ public class addItemController {
             } 
             return null;
         };
-		TextFormatter<Double> x = new TextFormatter<Double>(new DoubleStringConverter(),null, doubleFilter);
+		TextFormatter<Double> x = new TextFormatter<Double>(new DoubleStringConverter(), null, doubleFilter);
 		price.setTextFormatter(x);
 	}
 

@@ -39,9 +39,9 @@ public class ItemListController implements Initializable{
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/addItem.fxml"));
 				Parent root = loader.load();
 				Scene scene = new Scene(root);
-				addItemController hihi = (addItemController)loader.getController();
-				hihi.callMePwease();
-				hihi.prep();
+				addItemController itemPage = (addItemController)loader.getController();
+				itemPage.prepFilter();
+				itemPage.prepListener();
 				s.setScene(scene);
 				s.show();
 			} catch (IOException e1) {
@@ -61,11 +61,11 @@ public class ItemListController implements Initializable{
 				try {
 					Parent root = loader.load();
 					Scene scene = new Scene(root);
-					addItemController hihi = (addItemController)loader.getController();
-					hihi.currItem=currSelected;
-					hihi.currItemPos=itemTable.getSelectionModel().getSelectedIndex();
-					hihi.callMePwease();
-					hihi.prep();
+					addItemController itemPage = (addItemController)loader.getController();
+					itemPage.currItem=currSelected;
+					itemPage.currItemPos=itemTable.getSelectionModel().getSelectedIndex();
+					itemPage.prepFilter();
+					itemPage.prepListener();
 					s.setScene(scene);
 					s.show();
 				} catch (IOException e1) {

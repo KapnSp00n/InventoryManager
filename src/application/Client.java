@@ -8,13 +8,12 @@ public class Client implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 983889814512600641L;
-	private String username, password;
+	private String username;
 	private ArrayList<Order> buyOrders;
 	private ArrayList<Order> sellOrders;
 	private ArrayList<Item> items;
-	public Client(String username, String password) {
+	public Client(String username) {
 		this.username=username;
-		this.password=password;
 		items = new ArrayList<Item>();
 		buyOrders = new ArrayList<Order>();
 		sellOrders = new ArrayList<Order>();
