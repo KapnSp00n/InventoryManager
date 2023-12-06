@@ -17,10 +17,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.TableRow;
 
 public class SusController implements Initializable {
 	@FXML
@@ -122,6 +125,23 @@ public class SusController implements Initializable {
 			}
 		}
 	}
+	public void openOrder(Order selectedOrder) {
+		if (selectedOrder != null) {
+			try {
+				Stage stage = new Stage();
+				FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/main.fxml"));
+				Parent root = loader.load();
+				((Controller)loader.getController()).setCurrentOrder(selectedOrder);
+				Scene scene = new Scene(root);
+				scene.getStylesheets().add(getClass().getResource("/view/application.css").toExternalForm());
+				stage.setScene(scene);
+				stage.setTitle("Order Processor2");
+				stage.show();
+			} catch (Exception eee) {
+				eee.printStackTrace();
+			}
+		}
+	}
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		manuCol.setCellValueFactory(new PropertyValueFactory<Order, String>("producer"));
@@ -129,6 +149,49 @@ public class SusController implements Initializable {
 		total.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("total"));
 		tax.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("tax"));
 		totalWTax.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("totalWTax"));
+
+		//Creates ContextMenu for orderTable
+    	ContextMenu menu = new ContextMenu();
+    	MenuItem mitem1 = new MenuItem("Edit");
+    	MenuItem mitem2 = new MenuItem("Duplicate");
+    	MenuItem mitem3 = new MenuItem("Delete Order");
+    	menu.getItems().add(mitem1);
+    	menu.getItems().add(mitem2);
+    	menu.getItems().add(mitem3);
+    	
+    	//Defines what each menu item will do
+    	menu.setOnAction((ActionEvent event) ->{
+    		Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
+    		if (event.getTarget()==mitem1) {
+    			openOrder(selectedOrder);
+    		} else if (event.getTarget()==mitem2) {
+    			orderTable.getItems().add(new Order (selectedOrder));
+    		} else if (event.getTarget()==mitem3){
+    			orderTable.getItems().remove(selectedOrder);
+    		}
+    	});
+    	
+    	//Add ContextMenu to orderTable
+    	orderTable.setContextMenu(menu);
+    	
+		orderTable.setOnMouseClicked(e->{
+			if (e.getButton().equals(MouseButton.PRIMARY)&&e.getClickCount() == 2) {
+				Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
+	            openOrder(selectedOrder);
+	        } 
+		});
+		
+//		orderTable.setRowFactory( tv -> {
+//		    TableRow<Order> row = new TableRow<Order>();
+//		    row.setOnMouseClicked(event -> {
+//		        if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+//		            System.out.println("Hello");
+//		        }
+//		    });
+//		    row.setContextMenu(menu);
+//		    return row ;
+//		});
+		
 		
 		if (leClient.getOrders()!=null && leClient.getSellOrders()!=null) {
 			buyOrdersList=FXCollections.observableList(leClient.getOrders());

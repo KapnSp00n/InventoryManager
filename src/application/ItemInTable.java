@@ -32,6 +32,14 @@ public class ItemInTable implements Serializable {
 	public ItemInTable(ChoiceBox<Item> items) {
 		this.items = items;
 	}
+	public ItemInTable (ItemInTable x) {
+		theItem = x.theItem;
+		total = x.total;
+		totalTax = x.totalTax;
+		price00 = x.price00;
+		num0 = x.num0;
+		tax0 = x.tax0;
+	}
 
 	public ChoiceBox<Item> getItems() {
 		return items;

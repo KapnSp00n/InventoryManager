@@ -31,6 +31,13 @@ public class Order implements Serializable{
 		this.date = copyMe.date;
 		this.producer=copyMe.producer;
 		this.items = new ArrayList<ItemInTable>();
+		for (ItemInTable curr: copyMe.items) {
+			this.items.add(new ItemInTable(curr));
+		}
+		type = copyMe.type;
+		total = copyMe.total;
+		tax = copyMe.tax;
+		totalWTax = copyMe.totalWTax;
 	}
 	public String getProducer() {
 		return producer;
