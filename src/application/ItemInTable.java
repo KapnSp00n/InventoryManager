@@ -7,6 +7,7 @@ import java.util.function.UnaryOperator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.DoubleStringConverter;
@@ -17,7 +18,6 @@ public class ItemInTable implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -1649273385016940349L;
-	private transient ChoiceBox<Item> items;
 	private transient TextField price;
 	private transient TextField num;
 	private BigDecimal total;
@@ -25,24 +25,19 @@ public class ItemInTable implements Serializable {
 	private BigDecimal totalTax;
 
 	private Item theItem;
-	private BigDecimal price00;
+	private BigDecimal price0;
 	private int num0;
 	private BigDecimal tax0;
 
-	public ItemInTable(ChoiceBox<Item> items) {
-		this.items = items;
+	public ItemInTable() {
 	}
 	public ItemInTable (ItemInTable x) {
 		theItem = x.theItem;
 		total = x.total;
 		totalTax = x.totalTax;
-		price00 = x.price00;
+		price0 = x.price0;
 		num0 = x.num0;
 		tax0 = x.tax0;
-	}
-
-	public ChoiceBox<Item> getItems() {
-		return items;
 	}
 
 	public TextField getPrice() {
@@ -70,23 +65,18 @@ public class ItemInTable implements Serializable {
 		return new BigDecimal(tax.getText());
 	}
 
-	void prep(int numRow, ObservableList<ItemInTable> items2) {
-		items = new ChoiceBox<Item>(FXCollections.observableList(SusController.leClient.getItems()));
-		if (numRow == items2.size() - 1) {
-			items.setVisible(false);
-		}
+	void prep(TableView<ItemInTable> items2) {
 		if (theItem != null) {
-			items.getSelectionModel().select(theItem);
-			prepNumAndTax(numRow, items2);
-			setPrice(price00);
+			prepNumAndTax(items2);
+			setPrice(price0);
 			num.setText("" + num0);
 			tax.setText("" + (tax0==null?0:tax0));
-			items2.set(numRow, this);
+			items2.refresh();
 		}
 	}
 
 	public void resetStoredStuff() {
-		price00 = null;
+		price0 = null;
 		num0 = 0;
 		tax0 = null;
 		total = null;
@@ -116,38 +106,37 @@ public class ItemInTable implements Serializable {
 		TextFormatter<Integer> x = new TextFormatter<Integer>(new IntegerStringConverter(), null, intFilter);
 		return x;
 	}
-
+	
 	// Preparing the TextField for tax and num input
-	public void prepNumAndTax(int numRow, ObservableList<ItemInTable> items2) {
+	public void prepNumAndTax(TableView<ItemInTable> items2) {
 		price = new TextField();
-		theItem = items.getValue();
 		price.setTextFormatter(createFormatter());
 		price.textProperty().addListener((observable, oldValue, newValue) -> {
-			price00 = getP();
+			price0 = getP();
 			String numInput = num.getText();
 			String taxIn = tax.getText();
 			if (num!=null&&!numInput.equals("")) {
-				total = price00.multiply(new BigDecimal (numInput));
+				total = price0.multiply(new BigDecimal (numInput));
 				totalTax = total;
 			}
 			if (!taxIn.equals("")&&total!=null) {
 				totalTax = total
 						.add(total.multiply((new BigDecimal(taxIn)).divide(new BigDecimal(100))));
 			}
-			items2.set(numRow, this);
+			items2.refresh();
 		});
 		num = new TextField();
 		num.setTextFormatter(createIntFormatter());
 		num.textProperty().addListener((observable, oldValue, newValue) -> {
 			num0 = getN();
-			total = price00.multiply(new BigDecimal(num0));
+			total = price0.multiply(new BigDecimal(num0));
 			if (tax0!=null) {
 				totalTax = total
 						.add(total.multiply(tax0.divide(new BigDecimal(100))));
 			} else {
 				totalTax = total;
 			}
-			items2.set(numRow, this);
+			items2.refresh();
 		});
 		tax = new TextField();
 		tax.setTextFormatter(createFormatter());
@@ -157,7 +146,7 @@ public class ItemInTable implements Serializable {
 				totalTax = total
 						.add(total.multiply(tax0.divide(new BigDecimal(100))));
 			}
-			items2.set(numRow, this);
+			items2.refresh();
 		});
 	}
 
@@ -185,7 +174,10 @@ public class ItemInTable implements Serializable {
 		return tax0;
 	}
 
-	public Item getItem() {
+	public Item getTheItem() {
 		return theItem;
+	}
+	public void setTheItem(Item theItem) {
+		this.theItem = theItem;
 	}
 }

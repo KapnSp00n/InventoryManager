@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,7 +21,10 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.InputEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -30,7 +34,7 @@ public class Controller implements Initializable{
 	@FXML
 	TableView<ItemInTable> table;
 	@FXML
-	TableColumn<ItemInTable, ChoiceBox<Item>> itemBox;
+	TableColumn<ItemInTable, Item> itemBox;
 	@FXML
 	TableColumn<ItemInTable, TextField> price, num, tax;
 	@FXML
@@ -82,78 +86,84 @@ public class Controller implements Initializable{
 		list.setItems(items);
 		
 		//TableView Setup
-		itemBox.setCellValueFactory(new PropertyValueFactory<ItemInTable,ChoiceBox<Item>>("items"));
+		table.setEditable(true);
+		itemBox.setEditable(true);
+		itemBox.setCellFactory(ChoiceBoxTableCell.forTableColumn(items));
+		itemBox.setOnEditCommit(e->{
+			ItemInTable curr = table.getSelectionModel().getSelectedItem();
+			curr.setTheItem(e.getNewValue());
+			curr.prepNumAndTax(table);
+			curr.setPrice(curr.getTheItem().getPrice());
+			if (e.getTablePosition().getRow()==table.getItems().size()-1) {
+				table.getItems().add(new ItemInTable());
+			}
+			table.refresh();
+		});
+		itemBox.setCellValueFactory(new PropertyValueFactory<ItemInTable,Item>("theItem"));
 		price.setCellValueFactory(new PropertyValueFactory<ItemInTable,TextField>("price"));
 		num.setCellValueFactory(new PropertyValueFactory<ItemInTable,TextField>("num"));
 		total.setCellValueFactory(new PropertyValueFactory<ItemInTable,Double>("total"));
 		tax.setCellValueFactory(new PropertyValueFactory<ItemInTable, TextField>("tax"));
 		totalTax.setCellValueFactory(new PropertyValueFactory<ItemInTable, Double>("totalTax"));
 		if (currentOrder==null) {
-			ChoiceBox<Item> kkk = new ChoiceBox<Item>(items);
 			ObservableList<ItemInTable> tableItems = FXCollections.observableArrayList(
-					new ItemInTable(kkk)
+					new ItemInTable()
 					);
-			kkk.setVisible(false);
-			table.setEditable(true);
 			table.setItems(tableItems);
-			//Call method below to prep cells'onAction.
-			setCell(0);
-			//call method that make listener for observable list so grandTotal can change
-			setListListener();
 		}
-		table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-			if (newSelection != null) {
-				newSelection.getItems().setVisible(true);
+		
+		//Recalculate grand whenever keys pressed are numbers
+		table.addEventHandler(KeyEvent.ANY, e->{
+			if (e.getText().matches("[0-9]")) {
+				calcGrand();
+				System.out.println("Hello");
 			}
-		});	
+		});
 	}
 	
 	//Listener for observable list so grandTotal can change
-	private void setListListener() {
-		table.getItems().addListener(new ListChangeListener<ItemInTable>() {
-			@Override
-			public void onChanged(Change<? extends ItemInTable> arg0) {
-				grand = BigDecimal.valueOf(0);
-				grandTax = BigDecimal.valueOf(0);
-				for (ItemInTable currItem : table.getItems()) {
-					if (currItem.getTotal()!=null) {
-						grand = grand.add(currItem.getTotal());
-					}
-					if (currItem.getTotalTax()!=null) {
-						grandTax = grandTax.add(currItem.getTotalTax());
-					}
-				}
-				gTotal.setText(NumberFormat.getCurrencyInstance().format(grand));
-				gTotalTax.setText(NumberFormat.getCurrencyInstance().format(grandTax));
+	void calcGrand() {
+		grand = BigDecimal.valueOf(0);
+		grandTax = BigDecimal.valueOf(0);
+		for (ItemInTable currItem : table.getItems()) {
+			if (currItem.getTotal() != null) {
+				grand = grand.add(currItem.getTotal());
 			}
-			
-		});
-	}
-	//Preparing cell by setOnAction and creating a new Item in observable list 
-	private void setCell(int numCell) {
-		ChoiceBox<Item> currBox = itemBox.getCellData(numCell);
-		currBox.setOnAction(e->{
-			ObservableList<ItemInTable> tabItems = table.getItems();
-			if (currBox.isShowing()) {
-				Item curr = currBox.getValue();
-				ItemInTable itTab = tabItems.get(numCell);
-				itTab.resetStoredStuff();
-				itTab.prepNumAndTax(numCell,tabItems);
-				if (curr!=null) {
-					itTab.setPrice(curr.getPrice());
-				}
-				tabItems.set(numCell, itTab);
-				if (numCell==tabItems.size()-1) {
-					ChoiceBox<Item> ggg = new ChoiceBox<Item>(items);
-					ggg.setVisible(false);
-					tabItems.add(new ItemInTable(ggg));
-					setCell(numCell+1);
-				}
-			} else {
-				currBox.setValue(tabItems.get(numCell).getItem());
+			if (currItem.getTotalTax() != null) {
+				grandTax = grandTax.add(currItem.getTotalTax());
 			}
-		});
+		}
+		gTotal.setText(NumberFormat.getCurrencyInstance().format(grand));
+		gTotalTax.setText(NumberFormat.getCurrencyInstance().format(grandTax));
 	}
+	
+	/*	Another way to do it but require keeping track of row number and giving each
+	 *  ItemInTable a ChoiceBox which is not efficient at all
+	 */
+//	private void setCell(int numCell) {
+//		ChoiceBox<Item> currBox = itemBox.getCellData(numCell);
+//		currBox.setOnAction(e->{
+//			ObservableList<ItemInTable> tabItems = table.getItems();
+//			if (currBox.isShowing()) {
+//				Item curr = currBox.getValue();
+//				ItemInTable itTab = tabItems.get(numCell);
+//				itTab.resetStoredStuff();
+//				itTab.prepNumAndTax(numCell,tabItems);
+//				if (curr!=null) {
+//					itTab.setPrice(curr.getPrice());
+//				}
+//				tabItems.set(numCell, itTab);
+//				if (numCell==tabItems.size()-1) {
+//					ChoiceBox<Item> ggg = new ChoiceBox<Item>(items);
+//					ggg.setVisible(false);
+//					tabItems.add(new ItemInTable(ggg));
+//					setCell(numCell+1);
+//				}
+//			} else {
+//				currBox.setValue(tabItems.get(numCell).getItem());
+//			}
+//		});
+//	}
 	
 	public void onSaveClick(ActionEvent e) {
 		if (currentOrder==null) {
@@ -197,9 +207,6 @@ public class Controller implements Initializable{
 			System.out.println("Select an item to remove");
 		} else {
 			table.getItems().remove(toRemove);
-			for (int i =0; i<table.getItems().size();i++) {
-				setCell(i);
-			}
 		}
 	}
 	public void setCurrentOrder(Order curr) {
@@ -210,14 +217,9 @@ public class Controller implements Initializable{
 		grandTax = currentOrder.getTotalWTax();
 		ObservableList<ItemInTable> currList = currentOrder.getOrderItems();
 		for (int i =0; i<currList.size();i++) {
-			currList.get(i).prep(i, currList);
+			currList.get(i).prep(table);
 		}
 		table.setItems(currList);
-		for (int i =0; i<currList.size();i++) {
-			setCell(i);
-		}
-		//Listener for observable list so grandTotal can change
-		setListListener();
 		gTotal.setText(NumberFormat.getCurrencyInstance().format(grand));
 		gTotalTax.setText(NumberFormat.getCurrencyInstance().format(grandTax));
 

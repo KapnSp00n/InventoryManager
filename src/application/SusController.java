@@ -17,6 +17,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.Parent;
@@ -144,12 +145,17 @@ public class SusController implements Initializable {
 	}
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+//		orderTable.setEditable(true);
+//		manuCol.setEditable(true);
+//    	manuCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		manuCol.setCellValueFactory(new PropertyValueFactory<Order, String>("producer"));
 		dateCol.setCellValueFactory(new PropertyValueFactory<Order, LocalDate>("date"));
 		total.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("total"));
 		tax.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("tax"));
 		totalWTax.setCellValueFactory(new PropertyValueFactory<Order, BigDecimal>("totalWTax"));
-
+		
+		//orderTable.getSelectionModel().setCellSelectionEnabled(true);
+		
 		//Creates ContextMenu for orderTable
     	ContextMenu menu = new ContextMenu();
     	MenuItem mitem1 = new MenuItem("Edit");
@@ -158,7 +164,6 @@ public class SusController implements Initializable {
     	menu.getItems().add(mitem1);
     	menu.getItems().add(mitem2);
     	menu.getItems().add(mitem3);
-    	
     	//Defines what each menu item will do
     	menu.setOnAction((ActionEvent event) ->{
     		Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
@@ -170,28 +175,28 @@ public class SusController implements Initializable {
     			orderTable.getItems().remove(selectedOrder);
     		}
     	});
-    	
-    	//Add ContextMenu to orderTable
-    	orderTable.setContextMenu(menu);
-    	
-		orderTable.setOnMouseClicked(e->{
-			if (e.getButton().equals(MouseButton.PRIMARY)&&e.getClickCount() == 2) {
-				Order selectedOrder = orderTable.getSelectionModel().getSelectedItem();
-	            openOrder(selectedOrder);
-	        } 
+		
+		/*Another way to do it (More clean because context menu only show if  
+    	  right click on an order)*/
+		orderTable.setRowFactory( tv -> {
+		    TableRow<Order> row = new TableRow<Order>();
+		    row.setContextMenu(menu); 
+		    row.setOnMouseClicked(event -> {
+		    	if (!row.isEmpty()) {
+		    		if (event.getButton().equals(MouseButton.PRIMARY) && 
+			        		event.getClickCount() == 2) {
+			        	Order selectedOrder = row.getItem();
+			            openOrder(selectedOrder);
+			        } 
+		    	}
+		    });
+		    row.setOnContextMenuRequested(e->{
+		    	if (row.isEmpty()) {
+		    		menu.hide();
+		    	}
+		    });
+		    return row ;
 		});
-		
-//		orderTable.setRowFactory( tv -> {
-//		    TableRow<Order> row = new TableRow<Order>();
-//		    row.setOnMouseClicked(event -> {
-//		        if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-//		            System.out.println("Hello");
-//		        }
-//		    });
-//		    row.setContextMenu(menu);
-//		    return row ;
-//		});
-		
 		
 		if (leClient.getOrders()!=null && leClient.getSellOrders()!=null) {
 			buyOrdersList=FXCollections.observableList(leClient.getOrders());
