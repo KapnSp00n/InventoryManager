@@ -4,6 +4,9 @@
    MySQL server. Here are some of the important MYSQL procedures if you intend to replicate<br /> 
    something similar<br />
    
+   Here are images of the log in and registering accounts page
+   ![login](https://github.com/NguyenLe-Dev/InventoryManager/assets/129339432/0d619c6d-e7c4-4b73-aefe-44355b37aa6f)
+   
    'addUser' procedure (This is called in the Java code to try registering an account)<br />
 ```
     CREATE DEFINER=`root`@`localhost` PROCEDURE `addUser`(
