@@ -14,7 +14,10 @@
    ![image](https://github.com/NguyenLe-Dev/InventoryManager/assets/129339432/a441a061-ee08-446a-899d-099dbafd5256)
    
    Adding new order
-   ![image](https://github.com/NguyenLe-Dev/InventoryManager/assets/129339432/91b99c9b-c531-43af-bb3b-5cb6db3a9d32)
+   ![image](https://github.com/NguyenLe-Dev/InventoryManager/assets/129339432/5230bfe8-d084-4322-b714-455d261d8e8f)
+   
+   Editable field in cell which only accept decimals that other elements react to 
+   ![image](https://github.com/NguyenLe-Dev/InventoryManager/assets/129339432/b6ace5fa-cd0f-4dd2-a1cc-c452f62ac3ec)
    
    'addUser' procedure (This is called in the Java code to try registering an account)<br />
 ```
